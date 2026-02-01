@@ -2,10 +2,11 @@ package main
 
 import (
 	"database/sql"
+	"encoding/json"
 	"os"
 	"time"
 
-	_ "github.com/jackc/pgx/v5"
+	_ "github.com/jackc/pgx/v5/stdlib"
 	"github.com/joho/godotenv"
 	"github.com/labstack/echo/v5"
 )
@@ -32,11 +33,14 @@ func main() {
 		return c.String(200, "health ok")
 	})
 
-	e.POST("/login", func(c *echo.Context) error {
-		token, err := Login(db, LoginRequest{
-			Email:    c.FormValue("email"),
-			Password: c.FormValue("password"),
-		})
+	e.POST("/api/login", func(c *echo.Context) error {
+		var req LoginRequest
+		err := json.NewDecoder(c.Request().Body).Decode(&req)
+		if err != nil {
+			return err
+		}
+
+		token, err := Login(db, req)
 		if err != nil {
 			return c.JSON(400, map[string]string{"error": err.Error()})
 		}

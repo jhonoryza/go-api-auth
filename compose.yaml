@@ -1,0 +1,9 @@
+services:
+  apiauth:
+    image: "jhonoryza/go-api-auth:latest"
+    container_name: "go-api-auth"
+    restart: unless-stopped
+    ports:
+      - 8002:8080
+    env_file:
+      - ./.env
